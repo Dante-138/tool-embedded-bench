@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Saídas geradas pelos scripts
+logs/
+saidas/
+
+# Segredos: nunca versionar
+.env
+*.pem
+*.key
