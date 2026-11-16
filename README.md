@@ -55,3 +55,7 @@ Todo script aceita `--help`.
 - `lora_link_budget.py` usa sensibilidade e SNR mínimo típicos da família SX127x. São valores de referência, não garantidos: confira o datasheet do seu rádio. O alcance em espaço livre é um limite otimista.
 - `filtro_temperatura.py` marca outliers na série inteira. Para séries longas com deriva lenta, uma janela deslizante seria mais adequada.
 - Estimativa de distância por RSSI (BLE) é grosseira: varia com corpo, paredes, antena e canal.
+
+## Licença
+
+MIT, veja [LICENSE](LICENSE).
