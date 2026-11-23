@@ -80,8 +80,7 @@ def rssi_esperado_dbm(ptx_dbm, gtx_dbi, grx_dbi, perdas_db, dist_km, freq_mhz):
     return ptx_dbm + gtx_dbi + grx_dbi - perdas_db - perda_espaco_livre_db(dist_km, freq_mhz)
 
 
-def distancia_maxima_km(ptx_dbm, gtx_dbi, grx_dbi, perdas_db, freq_mhz, sf,
-                        bw_hz=125_000, margem_db=10.0):
+def distancia_maxima_km(ptx_dbm, gtx_dbi, grx_dbi, perdas_db, freq_mhz, sf, bw_hz=125_000, margem_db=10.0):
     """Distância em que o RSSI esperado cai para (sensibilidade + margem), em espaço livre."""
     orcamento = ptx_dbm + gtx_dbi + grx_dbi - perdas_db - (sensibilidade_dbm(sf, bw_hz) + margem_db)
     return 10 ** ((orcamento - 32.44 - 20 * math.log10(freq_mhz)) / 20)
@@ -112,16 +111,19 @@ def main(argv=None):
     try:
         if args.cmd == "avaliar":
             res = avaliar(args.rssi, args.snr, args.sf, int(args.bw * 1000), args.margem)
-            print(f"Sensibilidade SF{args.sf}/{args.bw:g} kHz: "
-                  f"{sensibilidade_dbm(args.sf, int(args.bw * 1000)):.1f} dBm | "
-                  f"SNR mínimo: {SNR_MINIMO_DB[args.sf]:.1f} dB")
+            print(
+                f"Sensibilidade SF{args.sf}/{args.bw:g} kHz: "
+                f"{sensibilidade_dbm(args.sf, int(args.bw * 1000)):.1f} dBm | "
+                f"SNR mínimo: {SNR_MINIMO_DB[args.sf]:.1f} dB"
+            )
             print(f"Margem de RSSI: {res['margem_rssi_db']:+.1f} dB")
             print(f"Margem de SNR:  {res['margem_snr_db']:+.1f} dB")
             print(f"Margem efetiva: {res['margem_efetiva_db']:+.1f} dB (limitada por {res['limitante']})")
             print(f"Avaliação (desejado {args.margem:g} dB): {res['status']}")
         else:
-            d = distancia_maxima_km(args.ptx, args.gtx, args.grx, args.perdas, args.freq,
-                                    args.sf, int(args.bw * 1000), args.margem)
+            d = distancia_maxima_km(
+                args.ptx, args.gtx, args.grx, args.perdas, args.freq, args.sf, int(args.bw * 1000), args.margem
+            )
             print(f"Alcance máximo teórico (espaço livre, margem {args.margem:g} dB): {d:.1f} km")
             print("Limite otimista: visada direta, sem obstáculos. Em campo, espere bem menos.")
     except ValueError as erro:

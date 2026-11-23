@@ -21,8 +21,9 @@ class TestRegistro(unittest.TestCase):
     def test_texto_simples(self):
         r = m.montar_registro(mensagem(), AGORA)
         self.assertEqual(r["timestamp"], "2026-09-29T14:03:07.412")
-        self.assertEqual((r["topico"], r["qos"], r["retain"], r["binario"], r["payload"]),
-                         ("sensores/a", 1, False, False, "21.5"))
+        self.assertEqual(
+            (r["topico"], r["qos"], r["retain"], r["binario"], r["payload"]), ("sensores/a", 1, False, False, "21.5")
+        )
         self.assertEqual(r["json"], 21.5)  # "21.5" também é JSON válido
 
     def test_payload_json_vira_objeto(self):

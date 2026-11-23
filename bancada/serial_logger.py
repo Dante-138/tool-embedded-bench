@@ -132,8 +132,9 @@ def main(argv=None):
     ap.add_argument("--porta", required=True, help="ex.: COM11 ou /dev/ttyUSB0")
     ap.add_argument("--baud", type=int, default=115200)
     ap.add_argument("--saida", help="arquivo de log (padrão: logs/serial_AAAAMMDD_HHMMSS.log)")
-    ap.add_argument("--dtr-rts-padrao", action="store_true",
-                    help="não zerar DTR/RTS ao abrir (pode resetar placas ESP32)")
+    ap.add_argument(
+        "--dtr-rts-padrao", action="store_true", help="não zerar DTR/RTS ao abrir (pode resetar placas ESP32)"
+    )
     ap.add_argument("--manter-cor", action="store_true", help="não remover códigos ANSI de cor")
     ap.add_argument("--espera", type=float, default=2.0, help="segundos entre tentativas de reconexão")
     ap.add_argument("--max-segundos", type=float, help="encerra sozinho após N segundos")
@@ -143,8 +144,7 @@ def main(argv=None):
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(errors="replace")  # console cp1252 não imprime U+FFFD
     try:
-        executar(args.porta, args.baud, saida, args.dtr_rts_padrao,
-                 args.manter_cor, args.espera, args.max_segundos)
+        executar(args.porta, args.baud, saida, args.dtr_rts_padrao, args.manter_cor, args.espera, args.max_segundos)
     except KeyboardInterrupt:
         print("\n[logger] interrompido")
     return 0

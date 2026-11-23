@@ -77,10 +77,14 @@ def parse_fase(texto):
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Autonomia de bateria por perfil de consumo.")
     ap.add_argument("--capacidade", type=float, required=True, help="capacidade nominal em mAh")
-    ap.add_argument("--fase", type=parse_fase, action="append", required=True,
-                    help="nome:corrente_mA:duração_s (repita para cada fase do ciclo)")
-    ap.add_argument("--aproveitamento", type=float, default=0.8,
-                    help="fração utilizável da capacidade (padrão 0,8)")
+    ap.add_argument(
+        "--fase",
+        type=parse_fase,
+        action="append",
+        required=True,
+        help="nome:corrente_mA:duração_s (repita para cada fase do ciclo)",
+    )
+    ap.add_argument("--aproveitamento", type=float, default=0.8, help="fração utilizável da capacidade (padrão 0,8)")
     ap.add_argument("--autodescarga", type=float, default=0.0, help="autodescarga em %% ao mês")
     args = ap.parse_args(argv)
 

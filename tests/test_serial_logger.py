@@ -89,12 +89,19 @@ class TestExecutar(unittest.TestCase):
 
     def executar(self, porta, max_segundos):
         with contextlib.redirect_stdout(io.StringIO()):
-            m.executar(porta, 115200, self.saida, dtr_rts_padrao=False, manter_cor=False,
-                       espera_s=0.1, max_segundos=max_segundos)
+            m.executar(
+                porta,
+                115200,
+                self.saida,
+                dtr_rts_padrao=False,
+                manter_cor=False,
+                espera_s=0.1,
+                max_segundos=max_segundos,
+            )
         linhas = self.saida.read_text(encoding="utf-8").splitlines()
         for linha in linhas:
             self.assertRegex(linha, PADRAO_LINHA)
-        return [PADRAO_LINHA.match(l).group(1) for l in linhas]
+        return [PADRAO_LINHA.match(linha).group(1) for linha in linhas]
 
     def test_conecta_grava_com_timestamp_e_encerra(self):
         mensagens = self.executar("loop://", max_segundos=0.2)

@@ -78,8 +78,9 @@ class TestCLI(unittest.TestCase):
     def test_saida_do_cli(self):
         saida = io.StringIO()
         with contextlib.redirect_stdout(saida):
-            codigo = m.main(["--capacidade", "1000", "--aproveitamento", "1",
-                             "--fase", "ativo:100:10", "--fase", "sleep:1:90"])
+            codigo = m.main(
+                ["--capacidade", "1000", "--aproveitamento", "1", "--fase", "ativo:100:10", "--fase", "sleep:1:90"]
+            )
         self.assertEqual(codigo, 0)
         texto = saida.getvalue()
         self.assertIn("10.9 mA", texto)

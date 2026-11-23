@@ -25,7 +25,7 @@ import statistics
 import sys
 from pathlib import Path
 
-TEMP_SAMPLES = 20      # espelham config.h do firmware
+TEMP_SAMPLES = 20  # espelham config.h do firmware
 TEMP_TRIM_PCT = 25
 TEMP_EMA_ALPHA = 0.3
 
@@ -34,7 +34,7 @@ def media_aparada(amostras, trim_pct=TEMP_TRIM_PCT):
     """Média depois de descartar `trim_pct` % de cada extremo (divisão inteira, como no C)."""
     n = len(amostras)
     corte = n * trim_pct // 100
-    miolo = sorted(amostras)[corte:n - corte]
+    miolo = sorted(amostras)[corte : n - corte]
     if not miolo:
         raise ValueError("sem amostras após o corte; reduza trim_pct ou traga mais amostras")
     return sum(miolo) / len(miolo)
@@ -66,8 +66,18 @@ def marcar_outliers(serie, limiar=3.5):
     return [abs((x - med) / (1.253314 * desvio_medio)) > limiar for x in serie]
 
 
-def processar(entrada, coluna, saida=None, grafico=None, sep=",", decimal=".",
-              encoding="utf-8-sig", alpha=TEMP_EMA_ALPHA, limiar=3.5, descartar_outliers=False):
+def processar(
+    entrada,
+    coluna,
+    saida=None,
+    grafico=None,
+    sep=",",
+    decimal=".",
+    encoding="utf-8-sig",
+    alpha=TEMP_EMA_ALPHA,
+    limiar=3.5,
+    descartar_outliers=False,
+):
     """Lê o CSV, acrescenta `<coluna>_ema` e `<coluna>_outlier` e devolve o DataFrame.
 
     Tudo é lido como texto: assim as demais colunas voltam idênticas no CSV de saída e
@@ -87,8 +97,9 @@ def processar(entrada, coluna, saida=None, grafico=None, sep=",", decimal=".",
     valores = pd.to_numeric(texto, errors="coerce")
     validos = valores.dropna()
     if validos.empty:
-        raise ValueError(f"a coluna {coluna!r} não tem nenhum valor numérico "
-                         f"(confira --sep={sep!r} e --decimal={decimal!r})")
+        raise ValueError(
+            f"a coluna {coluna!r} não tem nenhum valor numérico (confira --sep={sep!r} e --decimal={decimal!r})"
+        )
 
     flags = pd.Series(marcar_outliers(validos.tolist(), limiar), index=validos.index)
     base = validos[~flags] if descartar_outliers else validos
@@ -108,6 +119,7 @@ def processar(entrada, coluna, saida=None, grafico=None, sep=",", decimal=".",
 
 def _plotar(valores, suavizado, flags, coluna, caminho):
     import matplotlib
+
     matplotlib.use("Agg")  # sem janela: funciona em servidor e em automação
     import matplotlib.pyplot as plt
 
@@ -141,8 +153,18 @@ def main(argv=None):
     args = ap.parse_args(argv)
 
     try:
-        df = processar(args.entrada, args.coluna, args.saida, args.grafico, args.sep, args.decimal,
-                       args.encoding, args.alpha, args.limiar, args.descartar_outliers)
+        df = processar(
+            args.entrada,
+            args.coluna,
+            args.saida,
+            args.grafico,
+            args.sep,
+            args.decimal,
+            args.encoding,
+            args.alpha,
+            args.limiar,
+            args.descartar_outliers,
+        )
     except (ValueError, OSError) as erro:
         print(f"erro: {erro}", file=sys.stderr)
         return 2
