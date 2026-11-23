@@ -20,11 +20,19 @@ Nasceram do trabalho com firmware (ESP32, nRF), LoRaWAN e beacons BLE. Os valore
 
 ## Como usar
 
-Requer Python 3.10 ou superior (testado na 3.13).
+Requer Python 3.10 ou superior (o CI roda 3.10 e 3.13, no Linux e no Windows).
 
 ```
 pip install -r requirements.txt
-python -m unittest
+python -W error -m unittest
+```
+
+Antes de abrir PR, o mesmo portão do CI:
+
+```
+pip install -r requirements-dev.txt
+python -m ruff check .
+python -m ruff format --check .
 ```
 
 Exemplos:
@@ -43,6 +51,7 @@ Todo script aceita `--help`.
 ## Como foi validado
 
 - 144 testes com `unittest`, sem dependência extra, rodando com todo aviso tratado como erro.
+  O CI (`.github/workflows/ci.yml`) roda os testes e o ruff em todo PR.
 - Referências independentes, para não testar o código só contra ele mesmo:
   - CRC: valores do catálogo de CRCs para `123456789`, comparação com `zlib.crc32` e `binascii.crc_hqx`, e um quadro Modbus real (`01 03 00 00 00 0A` termina em `C5 CD`).
   - Tempo no ar LoRa: 41,2 ms (SF7) e 991,2 ms (SF12) para 10 bytes de payload PHY, e 61,7 ms e 1482,8 ms com o overhead LoRaWAN, os valores dos calculadores públicos de airtime.
