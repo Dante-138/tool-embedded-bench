@@ -50,7 +50,8 @@ Todo script aceita `--help`.
 
 ## Como foi validado
 
-- 144 testes com `unittest`, sem dependência extra, rodando com todo aviso tratado como erro.
+- 144 testes com `unittest` (só as dependências de `requirements.txt`), rodando com todo aviso tratado
+  como erro.
   O CI (`.github/workflows/ci.yml`) roda os testes e o ruff em todo PR.
 - Referências independentes, para não testar o código só contra ele mesmo:
   - CRC: valores do catálogo de CRCs para `123456789`, comparação com `zlib.crc32` e `binascii.crc_hqx`, e um quadro Modbus real (`01 03 00 00 00 0A` termina em `C5 CD`).
