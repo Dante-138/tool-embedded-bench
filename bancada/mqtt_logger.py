@@ -116,8 +116,7 @@ def executar(args):
         registro = montar_registro(msg)
         gravador.escrever(registro)
         marca = " [retain]" if registro["retain"] else ""
-        print(f"{registro['timestamp']} {registro['topico']}{marca}: {registro['payload'][:120]}",
-              flush=True)
+        print(f"{registro['timestamp']} {registro['topico']}{marca}: {registro['payload'][:120]}", flush=True)
 
     cliente.on_connect = ao_conectar
     cliente.on_message = ao_receber
@@ -140,8 +139,9 @@ def main(argv=None):
     ap.add_argument("--broker", required=True)
     ap.add_argument("--porta", type=int, default=1883)
     ap.add_argument("--tls", action="store_true", help="conexão TLS (normalmente porta 8883)")
-    ap.add_argument("--topico", action="append", required=True,
-                    help="tópico a assinar; pode repetir. Evite '#' em broker público")
+    ap.add_argument(
+        "--topico", action="append", required=True, help="tópico a assinar; pode repetir. Evite '#' em broker público"
+    )
     ap.add_argument("--qos", type=int, choices=(0, 1, 2), default=0)
     ap.add_argument("--saida", default=f"logs/mqtt_{datetime.now():%Y%m%d_%H%M%S}.jsonl")
     ap.add_argument("--max-segundos", type=float, help="encerra sozinho após N segundos")

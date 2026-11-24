@@ -58,16 +58,16 @@ def calcular(dados, p):
 
 # Parâmetros do catálogo de CRCs (Rocksoft). Valor de verificação: CRC de b"123456789".
 ALGORITMOS = {
-    "crc8":             ParametrosCRC(8,  0x07,       0x00,       False, False, 0x00),        # 0xF4
-    "crc8-maxim":       ParametrosCRC(8,  0x31,       0x00,       True,  True,  0x00),        # 0xA1 (1-Wire)
-    "crc16-ccitt-false": ParametrosCRC(16, 0x1021,    0xFFFF,     False, False, 0x0000),      # 0x29B1
-    "crc16-xmodem":     ParametrosCRC(16, 0x1021,     0x0000,     False, False, 0x0000),      # 0x31C3
-    "crc16-kermit":     ParametrosCRC(16, 0x1021,     0x0000,     True,  True,  0x0000),      # 0x2189
-    "crc16-modbus":     ParametrosCRC(16, 0x8005,     0xFFFF,     True,  True,  0x0000),      # 0x4B37
-    "crc16-arc":        ParametrosCRC(16, 0x8005,     0x0000,     True,  True,  0x0000),      # 0xBB3D
-    "crc32":            ParametrosCRC(32, 0x04C11DB7, 0xFFFFFFFF, True,  True,  0xFFFFFFFF),  # 0xCBF43926
-    "crc32c":           ParametrosCRC(32, 0x1EDC6F41, 0xFFFFFFFF, True,  True,  0xFFFFFFFF),  # 0xE3069283
-    "crc32-mpeg2":      ParametrosCRC(32, 0x04C11DB7, 0xFFFFFFFF, False, False, 0x00000000),  # 0x0376E6E7
+    "crc8": ParametrosCRC(8, 0x07, 0x00, False, False, 0x00),  # 0xF4
+    "crc8-maxim": ParametrosCRC(8, 0x31, 0x00, True, True, 0x00),  # 0xA1 (1-Wire)
+    "crc16-ccitt-false": ParametrosCRC(16, 0x1021, 0xFFFF, False, False, 0x0000),  # 0x29B1
+    "crc16-xmodem": ParametrosCRC(16, 0x1021, 0x0000, False, False, 0x0000),  # 0x31C3
+    "crc16-kermit": ParametrosCRC(16, 0x1021, 0x0000, True, True, 0x0000),  # 0x2189
+    "crc16-modbus": ParametrosCRC(16, 0x8005, 0xFFFF, True, True, 0x0000),  # 0x4B37
+    "crc16-arc": ParametrosCRC(16, 0x8005, 0x0000, True, True, 0x0000),  # 0xBB3D
+    "crc32": ParametrosCRC(32, 0x04C11DB7, 0xFFFFFFFF, True, True, 0xFFFFFFFF),  # 0xCBF43926
+    "crc32c": ParametrosCRC(32, 0x1EDC6F41, 0xFFFFFFFF, True, True, 0xFFFFFFFF),  # 0xE3069283
+    "crc32-mpeg2": ParametrosCRC(32, 0x04C11DB7, 0xFFFFFFFF, False, False, 0x00000000),  # 0x0376E6E7
 }
 
 
@@ -91,9 +91,11 @@ def main(argv=None):
 
     if args.listar:
         for nome, p in sorted(ALGORITMOS.items()):
-            print(f"{nome:<18} largura={p.largura:<2} poly=0x{p.poly:0{p.largura // 4}X} "
-                  f"init=0x{p.init:0{p.largura // 4}X} refin={int(p.refin)} refout={int(p.refout)} "
-                  f"xorout=0x{p.xorout:0{p.largura // 4}X}")
+            print(
+                f"{nome:<18} largura={p.largura:<2} poly=0x{p.poly:0{p.largura // 4}X} "
+                f"init=0x{p.init:0{p.largura // 4}X} refin={int(p.refin)} refout={int(p.refout)} "
+                f"xorout=0x{p.xorout:0{p.largura // 4}X}"
+            )
         return 0
 
     if not args.algoritmo or (args.hex is None and args.texto is None):

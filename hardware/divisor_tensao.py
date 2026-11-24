@@ -25,12 +25,36 @@ import sys
 
 SERIES = {
     "e12": [1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2],
-    "e24": [1.0, 1.1, 1.2, 1.3, 1.5, 1.6, 1.8, 2.0, 2.2, 2.4, 2.7, 3.0,
-            3.3, 3.6, 3.9, 4.3, 4.7, 5.1, 5.6, 6.2, 6.8, 7.5, 8.2, 9.1],
+    "e24": [
+        1.0,
+        1.1,
+        1.2,
+        1.3,
+        1.5,
+        1.6,
+        1.8,
+        2.0,
+        2.2,
+        2.4,
+        2.7,
+        3.0,
+        3.3,
+        3.6,
+        3.9,
+        4.3,
+        4.7,
+        5.1,
+        5.6,
+        6.2,
+        6.8,
+        7.5,
+        8.2,
+        9.1,
+    ],
 }
 
-_RE_NOTACAO = re.compile(r"^(\d+)([kKMR])(\d+)$")       # 4k7, 2R2, 1M5
-_RE_SUFIXO = re.compile(r"^(\d+(?:\.\d+)?)([kKM]?)$")   # 100k, 4.7k, 1M, 470
+_RE_NOTACAO = re.compile(r"^(\d+)([kKMR])(\d+)$")  # 4k7, 2R2, 1M5
+_RE_SUFIXO = re.compile(r"^(\d+(?:\.\d+)?)([kKM]?)$")  # 100k, 4.7k, 1M, 470
 _MULT = {"": 1.0, "k": 1e3, "K": 1e3, "M": 1e6, "R": 1.0}
 
 
@@ -69,12 +93,12 @@ def corrente_divisor_ua(vin, r1, r2):
 
 
 def contagens_adc(vout, vref, bits):
-    maximo = 2 ** bits - 1
+    maximo = 2**bits - 1
     return min(maximo, max(0, round(vout / vref * maximo)))
 
 
 def vin_de_contagens(contagens, r1, r2, vref, bits):
-    vout = contagens / (2 ** bits - 1) * vref
+    vout = contagens / (2**bits - 1) * vref
     return vin_a_partir_da_saida(vout, r1, r2)
 
 
@@ -89,7 +113,7 @@ def tolerancia_pior_caso(vin, r1, r2, tol_pct):
 def valores_da_serie(serie, decada_min=1, decada_max=6):
     """Valores comerciais de 10 ohm até ~9,1 Mohm (décadas 10^1 a 10^6)."""
     base = SERIES[serie]
-    return sorted({round(b * 10 ** d, 3) for b in base for d in range(decada_min, decada_max + 1)})
+    return sorted({round(b * 10**d, 3) for b in base for d in range(decada_min, decada_max + 1)})
 
 
 def projetar(vin_max, vout_alvo, serie="e24", rtotal_min=0.0, rtotal_max=math.inf, quantos=5):
@@ -107,8 +131,7 @@ def projetar(vin_max, vout_alvo, serie="e24", rtotal_min=0.0, rtotal_max=math.in
         candidatos.append((round(erro, 9), -total, r1, r2, vout))
     candidatos.sort()
     return [
-        {"r1": r1, "r2": r2, "vout": vout, "erro_pct": erro,
-         "corrente_ua": corrente_divisor_ua(vin_max, r1, r2)}
+        {"r1": r1, "r2": r2, "vout": vout, "erro_pct": erro, "corrente_ua": corrente_divisor_ua(vin_max, r1, r2)}
         for erro, _, r1, r2, vout in candidatos[:quantos]
     ]
 
@@ -155,18 +178,19 @@ def main(argv=None):
             vmin, vmax = tolerancia_pior_caso(args.vin, args.r1, args.r2, args.tol)
             print(f"Pior caso com +/-{args.tol:g}%: {vmin:.4f} V a {vmax:.4f} V")
     elif args.cmd == "projetar":
-        resultado = projetar(args.vin_max, args.vout, args.serie,
-                             args.rtotal_min, args.rtotal_max, args.quantos)
+        resultado = projetar(args.vin_max, args.vout, args.serie, args.rtotal_min, args.rtotal_max, args.quantos)
         if not resultado:
             print("nenhum par dentro dos limites de resistência total", file=sys.stderr)
             return 1
         print(f"{'R1':>8} {'R2':>8} {'Vout (V)':>9} {'erro %':>8} {'corrente uA':>12}")
         for r in resultado:
-            print(f"{formatar_resistencia(r['r1']):>8} {formatar_resistencia(r['r2']):>8} "
-                  f"{r['vout']:>9.4f} {r['erro_pct']:>8.3f} {r['corrente_ua']:>12.2f}")
+            print(
+                f"{formatar_resistencia(r['r1']):>8} {formatar_resistencia(r['r2']):>8} "
+                f"{r['vout']:>9.4f} {r['erro_pct']:>8.3f} {r['corrente_ua']:>12.2f}"
+            )
     else:
         vin = vin_de_contagens(args.contagens, args.r1, args.r2, args.vref, args.bits)
-        print(f"Tensão medida: {vin:.4f} V ({args.contagens} contagens de {2 ** args.bits - 1})")
+        print(f"Tensão medida: {vin:.4f} V ({args.contagens} contagens de {2**args.bits - 1})")
     return 0
 
 

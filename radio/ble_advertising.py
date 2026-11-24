@@ -43,9 +43,20 @@ FLAGS = {
 
 URL_ESQUEMAS = {0x00: "http://www.", 0x01: "https://www.", 0x02: "http://", 0x03: "https://"}
 URL_SUFIXOS = {
-    0x00: ".com/", 0x01: ".org/", 0x02: ".edu/", 0x03: ".net/", 0x04: ".info/", 0x05: ".biz/",
-    0x06: ".gov/", 0x07: ".com", 0x08: ".org", 0x09: ".edu", 0x0A: ".net", 0x0B: ".info",
-    0x0C: ".biz", 0x0D: ".gov",
+    0x00: ".com/",
+    0x01: ".org/",
+    0x02: ".edu/",
+    0x03: ".net/",
+    0x04: ".info/",
+    0x05: ".biz/",
+    0x06: ".gov/",
+    0x07: ".com",
+    0x08: ".org",
+    0x09: ".edu",
+    0x0A: ".net",
+    0x0B: ".info",
+    0x0C: ".biz",
+    0x0D: ".gov",
 }
 
 
@@ -63,9 +74,8 @@ def estruturas_ad(dados):
         if tamanho == 0:
             break
         if i + 1 + tamanho > len(dados):
-            raise ValueError(f"estrutura AD truncada no byte {i}: declara {tamanho} bytes, "
-                             f"restam {len(dados) - i - 1}")
-        itens.append((dados[i + 1], bytes(dados[i + 2:i + 1 + tamanho])))
+            raise ValueError(f"estrutura AD truncada no byte {i}: declara {tamanho} bytes, restam {len(dados) - i - 1}")
+        itens.append((dados[i + 1], bytes(dados[i + 2 : i + 1 + tamanho])))
         i += 1 + tamanho
     return itens
 
@@ -104,16 +114,24 @@ def decodificar_eddystone(valor):
     frame = valor[2:]
     tipo = frame[0]
     if tipo == 0x00 and len(frame) >= 18:
-        return {"frame": "UID", "potencia_0m_dbm": int.from_bytes(frame[1:2], "big", signed=True),
-                "namespace": frame[2:12].hex().upper(), "instancia": frame[12:18].hex().upper()}
+        return {
+            "frame": "UID",
+            "potencia_0m_dbm": int.from_bytes(frame[1:2], "big", signed=True),
+            "namespace": frame[2:12].hex().upper(),
+            "instancia": frame[12:18].hex().upper(),
+        }
     if tipo == 0x10 and len(frame) >= 3:
-        return {"frame": "URL", "potencia_0m_dbm": int.from_bytes(frame[1:2], "big", signed=True),
-                "url": decodificar_url_eddystone(frame[2:])}
+        return {
+            "frame": "URL",
+            "potencia_0m_dbm": int.from_bytes(frame[1:2], "big", signed=True),
+            "url": decodificar_url_eddystone(frame[2:]),
+        }
     if tipo == 0x20 and len(frame) >= 14:
         bruto_temp = int.from_bytes(frame[4:6], "big", signed=True)
         return {
-            "frame": "TLM", "versao": frame[1],
-            "bateria_mv": int.from_bytes(frame[2:4], "big") or None,        # 0 = não suportado
+            "frame": "TLM",
+            "versao": frame[1],
+            "bateria_mv": int.from_bytes(frame[2:4], "big") or None,  # 0 = não suportado
             "temperatura_c": None if bruto_temp == -32768 else bruto_temp / 256.0,  # 0x8000 = n/d
             "pacotes_enviados": int.from_bytes(frame[6:10], "big"),
             "tempo_ligado_s": int.from_bytes(frame[10:14], "big") / 10.0,

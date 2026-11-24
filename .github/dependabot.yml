@@ -1,0 +1,28 @@
+# PRs semanais agrupados por ecossistema. cooldown: só propõe versão publicada há pelo menos
+# 7 dias (pacote comprometido costuma ser retirado nos primeiros dias).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ['*']
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+    groups:
+      pip:
+        patterns: ['*']

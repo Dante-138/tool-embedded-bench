@@ -7,10 +7,10 @@ from radio import ble_advertising as m
 # UUID de exemplo público (AirLocate da Apple), não pertence a nenhum produto real.
 UUID_EXEMPLO = "E2C56DB5DFFB48D2B060D0F5A71096E0"
 
-IBEACON = bytes.fromhex("020106" "1AFF" "4C000215" + UUID_EXEMPLO + "0001" "0002" "C5")
-EDDYSTONE_UID = bytes.fromhex("020106" "0303AAFE" "1716AAFE" "00" "E7" "00112233445566778899" "AABBCCDDEEFF" "0000")
-EDDYSTONE_URL = bytes.fromhex("0303AAFE" "0E16AAFE" "10" "E7" "01" + b"example".hex() + "00")
-EDDYSTONE_TLM = bytes.fromhex("0303AAFE" "1116AAFE" "20" "00" "0BB8" "1880" "0000002A" "00000FA0")
+IBEACON = bytes.fromhex("0201061AFF4C000215" + UUID_EXEMPLO + "00010002C5")
+EDDYSTONE_UID = bytes.fromhex("0201060303AAFE1716AAFE00E700112233445566778899AABBCCDDEEFF0000")
+EDDYSTONE_URL = bytes.fromhex("0303AAFE0E16AAFE10E701" + b"example".hex() + "00")
+EDDYSTONE_TLM = bytes.fromhex("0303AAFE1116AAFE20000BB818800000002A00000FA0")
 
 
 def por_tipo(itens, tipo):
@@ -24,17 +24,16 @@ class TestEstruturasAD(unittest.TestCase):
         self.assertEqual(estruturas[0][1], b"\x06")
 
     def test_zeros_de_preenchimento_encerram_a_leitura(self):
-        estruturas = m.estruturas_ad(bytes.fromhex("020106" "000000"))
+        estruturas = m.estruturas_ad(bytes.fromhex("020106000000"))
         self.assertEqual(len(estruturas), 1)
 
     def test_estrutura_truncada_levanta_erro(self):
         with self.assertRaises(ValueError):
-            m.estruturas_ad(bytes.fromhex("020106" "1AFF4C00"))
+            m.estruturas_ad(bytes.fromhex("0201061AFF4C00"))
 
     def test_flags(self):
         itens = m.interpretar(bytes.fromhex("020106"))
-        self.assertEqual(por_tipo(itens, 0x01)["flags"],
-                         ["LE general discoverable", "BR/EDR não suportado"])
+        self.assertEqual(por_tipo(itens, 0x01)["flags"], ["LE general discoverable", "BR/EDR não suportado"])
 
     def test_nome_completo_e_tx_power(self):
         itens = m.interpretar(bytes.fromhex("0509" + b"Node".hex() + "020AF4"))
@@ -50,7 +49,7 @@ class TestIBeacon(unittest.TestCase):
         self.assertEqual(ib["potencia_1m_dbm"], -59)
 
     def test_fabricante_que_nao_e_ibeacon(self):
-        item = por_tipo(m.interpretar(bytes.fromhex("05FF" "5900" "0102")), 0xFF)
+        item = por_tipo(m.interpretar(bytes.fromhex("05FF59000102")), 0xFF)
         self.assertNotIn("ibeacon", item)
         self.assertEqual(item["empresa_id"], "0x0059")
 
@@ -82,13 +81,13 @@ class TestEddystone(unittest.TestCase):
         self.assertAlmostEqual(ed["tempo_ligado_s"], 400.0)
 
     def test_tlm_sem_sensor_de_temperatura(self):
-        dados = bytes.fromhex("0303AAFE" "1116AAFE" "20" "00" "0BB8" "8000" "0000002A" "00000FA0")
+        dados = bytes.fromhex("0303AAFE1116AAFE20000BB880000000002A00000FA0")
         ed = por_tipo(m.interpretar(dados), 0x16)["eddystone"]
         self.assertIsNone(ed["temperatura_c"])
 
     def test_service_data_de_outro_servico_nao_e_eddystone(self):
         # Service Data do serviço de bateria (0x180F): tamanho 4 = tipo + UUID (2) + 1 byte de dado.
-        item = por_tipo(m.interpretar(bytes.fromhex("0416" "0F18" "5A")), 0x16)
+        item = por_tipo(m.interpretar(bytes.fromhex("04160F185A")), 0x16)
         self.assertNotIn("eddystone", item)
 
 

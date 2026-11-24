@@ -34,15 +34,15 @@ SOBRECARGA_LORAWAN_UPLINK = 13  # bytes: MHDR + FHDR(7) + FPort + MIC, sem FOpts
 class ParametrosLoRa:
     sf: int
     bw_hz: int = 125_000
-    cr: int = 1                 # 1..4 => 4/5, 4/6, 4/7, 4/8
+    cr: int = 1  # 1..4 => 4/5, 4/6, 4/7, 4/8
     preambulo: int = 8
     header_explicito: bool = True
     crc_payload: bool = True
-    ldro: bool | None = None    # None => decide automaticamente
+    ldro: bool | None = None  # None => decide automaticamente
 
 
 def duracao_simbolo_s(sf, bw_hz):
-    return (2 ** sf) / bw_hz
+    return (2**sf) / bw_hz
 
 
 def precisa_ldro(sf, bw_hz):
@@ -78,7 +78,7 @@ def tempo_no_ar_ms(payload_bytes, p):
 
 def taxa_bits_por_s(p):
     """Taxa de bits nominal: SF * (BW / 2^SF) * 4/(4+CR)."""
-    return p.sf * (p.bw_hz / 2 ** p.sf) * 4 / (4 + p.cr)
+    return p.sf * (p.bw_hz / 2**p.sf) * 4 / (4 + p.cr)
 
 
 def intervalo_minimo_s(toa_ms, duty_cycle_pct):
@@ -91,8 +91,9 @@ def intervalo_minimo_s(toa_ms, duty_cycle_pct):
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Tempo no ar de pacotes LoRa.")
     ap.add_argument("--payload", type=int, required=True, help="bytes de payload")
-    ap.add_argument("--lorawan", action="store_true",
-                    help=f"soma {SOBRECARGA_LORAWAN_UPLINK} bytes de overhead de uplink LoRaWAN")
+    ap.add_argument(
+        "--lorawan", action="store_true", help=f"soma {SOBRECARGA_LORAWAN_UPLINK} bytes de overhead de uplink LoRaWAN"
+    )
     ap.add_argument("--sf", type=int, help="fator de espalhamento 7..12 (omita para ver todos)")
     ap.add_argument("--bw", type=float, default=125, help="largura de banda em kHz (padrão 125)")
     ap.add_argument("--cr", type=int, default=1, choices=(1, 2, 3, 4), help="1=4/5 ... 4=4/8")
@@ -111,11 +112,18 @@ def main(argv=None):
     linhas = []
     try:  # calcula tudo antes de imprimir: entrada inválida não deixa saída pela metade
         for sf in sfs:
-            p = ParametrosLoRa(sf=sf, bw_hz=int(args.bw * 1000), cr=args.cr, preambulo=args.preambulo,
-                               header_explicito=not args.header_implicito, crc_payload=not args.sem_crc)
+            p = ParametrosLoRa(
+                sf=sf,
+                bw_hz=int(args.bw * 1000),
+                cr=args.cr,
+                preambulo=args.preambulo,
+                header_explicito=not args.header_implicito,
+                crc_payload=not args.sem_crc,
+            )
             toa = tempo_no_ar_ms(pl, p)
-            linha = (f"{sf:>3} {toa:>10.1f} {taxa_bits_por_s(p):>13.0f} "
-                     f"{'sim' if precisa_ldro(sf, p.bw_hz) else 'não':>5}")
+            linha = (
+                f"{sf:>3} {toa:>10.1f} {taxa_bits_por_s(p):>13.0f} {'sim' if precisa_ldro(sf, p.bw_hz) else 'não':>5}"
+            )
             if args.duty_cycle:
                 linha += f" {intervalo_minimo_s(toa, args.duty_cycle):>18.1f}"
             linhas.append(linha)

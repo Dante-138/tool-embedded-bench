@@ -8,8 +8,16 @@ from hardware import divisor_tensao as m
 
 class TestParseResistencia(unittest.TestCase):
     def test_formatos(self):
-        casos = {"470": 470.0, "100k": 100_000.0, "100K": 100_000.0, "4.7k": 4700.0,
-                 "4k7": 4700.0, "2R2": 2.2, "1M": 1_000_000.0, "1M5": 1_500_000.0}
+        casos = {
+            "470": 470.0,
+            "100k": 100_000.0,
+            "100K": 100_000.0,
+            "4.7k": 4700.0,
+            "4k7": 4700.0,
+            "2R2": 2.2,
+            "1M": 1_000_000.0,
+            "1M5": 1_500_000.0,
+        }
         for texto, esperado in casos.items():
             with self.subTest(texto=texto):
                 self.assertAlmostEqual(m.parse_resistencia(texto), esperado)
@@ -119,14 +127,14 @@ class TestCLI(unittest.TestCase):
         self.assertIn("2.0790 V a 2.1210 V", texto)
 
     def test_projetar(self):
-        codigo, texto = self.rodar(["projetar", "--vin-max", "4.2", "--vout", "2.1",
-                                    "--rtotal-min", "200k", "--rtotal-max", "2M"])
+        codigo, texto = self.rodar(
+            ["projetar", "--vin-max", "4.2", "--vout", "2.1", "--rtotal-min", "200k", "--rtotal-max", "2M"]
+        )
         self.assertEqual(codigo, 0)
         self.assertIn("1M", texto)
 
     def test_adc(self):
-        codigo, texto = self.rodar(["adc", "--contagens", "2048", "--r1", "100k", "--r2", "100k",
-                                    "--vref", "3.3"])
+        codigo, texto = self.rodar(["adc", "--contagens", "2048", "--r1", "100k", "--r2", "100k", "--vref", "3.3"])
         self.assertEqual(codigo, 0)
         self.assertIn("V (2048 contagens de 4095)", texto)
 

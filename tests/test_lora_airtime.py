@@ -41,7 +41,7 @@ class TestTempoNoAr(unittest.TestCase):
 class TestLDRO(unittest.TestCase):
     def test_automatico(self):
         self.assertTrue(m.precisa_ldro(12, 125_000))
-        self.assertTrue(m.precisa_ldro(11, 125_000))   # 16,384 ms > 16 ms
+        self.assertTrue(m.precisa_ldro(11, 125_000))  # 16,384 ms > 16 ms
         self.assertFalse(m.precisa_ldro(10, 125_000))
         self.assertFalse(m.precisa_ldro(12, 500_000))  # 8,192 ms
 
@@ -65,9 +65,15 @@ class TestTaxaEDutyCycle(unittest.TestCase):
 
 class TestValidacao(unittest.TestCase):
     def test_parametros_invalidos(self):
-        casos = [(10, dict(sf=6)), (10, dict(sf=13)), (10, dict(sf=7, cr=0)),
-                 (10, dict(sf=7, cr=5)), (256, dict(sf=7)), (-1, dict(sf=7)),
-                 (10, dict(sf=7, bw_hz=0))]
+        casos = [
+            (10, dict(sf=6)),
+            (10, dict(sf=13)),
+            (10, dict(sf=7, cr=0)),
+            (10, dict(sf=7, cr=5)),
+            (256, dict(sf=7)),
+            (-1, dict(sf=7)),
+            (10, dict(sf=7, bw_hz=0)),
+        ]
         for payload, kw in casos:
             with self.subTest(payload=payload, **kw), self.assertRaises(ValueError):
                 m.tempo_no_ar_ms(payload, m.ParametrosLoRa(**kw))
@@ -80,8 +86,8 @@ class TestCLI(unittest.TestCase):
             codigo = m.main(["--payload", "10", "--lorawan", "--duty-cycle", "1"])
         self.assertEqual(codigo, 0)
         texto = saida.getvalue()
-        self.assertIn("61.7", texto)      # SF7, 23 bytes PHY
-        self.assertIn("1482.8", texto)    # SF12, 23 bytes PHY
+        self.assertIn("61.7", texto)  # SF7, 23 bytes PHY
+        self.assertIn("1482.8", texto)  # SF12, 23 bytes PHY
         self.assertIn("intervalo min", texto)
 
     def test_sf_invalido_retorna_erro(self):
